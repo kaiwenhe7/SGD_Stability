@@ -1,0 +1,27 @@
+{
+  "name": "synthetic_validation",
+  "shared_sqnorms": [0.0, 0.25, 1.0, 4.0],
+  "private_sqnorms": [0.01, 0.1, 1.0],
+  "anchor_sqnorms": [0.25, 1.0, 4.0],
+  "batch_sizes": [1, 2],
+  "learning_rate_fractions": [0.25, 0.5, 0.9, 0.99, 1.0, 1.01, 1.1],
+  "edit_amplitudes": [-0.1, 0.000001, 0.1, 1.0],
+  "highlight_rule": "Maximum coupling among all grid rows with learning_rate_fraction <= 0.99 and strictly positive shared slack; retain every weak, zero-coupling, unstable, and negative-slack row.",
+  "orthogonal": {
+    "n_examples": 8,
+    "support_sizes": [1, 2, 4, 8],
+    "batch_sizes": [1, 2, 4, 8],
+    "learning_rate_fractions": [0.9, 1.0, 1.1]
+  },
+  "dynamics": {
+    "shared_sqnorm": 1.0,
+    "private_sqnorm": 1.0,
+    "anchor_sqnorm": 1.0,
+    "batch_size": 1,
+    "learning_rate_fractions": [0.9, 1.1],
+    "steps": 40,
+    "trajectories": 100000,
+    "seed": 20261007,
+    "initial_error": [0.7071067811865475, 0.7071067811865475]
+  }
+}

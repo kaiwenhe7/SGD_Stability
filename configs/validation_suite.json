@@ -1,0 +1,55 @@
+{
+  "protocol_version": 1,
+  "title": "Conditional stability and local editability validation",
+  "experiments": [
+    {
+      "name": "clean",
+      "config": "configs/validation_clean.json",
+      "purpose": "Primary paired learning-rate/batch sweep with update-matched warmup and hold."
+    },
+    {
+      "name": "corrupted",
+      "config": "configs/validation_corrupted.json",
+      "purpose": "Exactly half the selected training labels are changed to uniformly chosen wrong classes; clean test labels remain fixed."
+    },
+    {
+      "name": "epoch_warmup",
+      "config": "configs/validation_epoch_warmup.json",
+      "purpose": "Schedule control: 300 epoch warmup (4800 updates at B8, 1200 at B32), same 200-update hold and 20000-update cap."
+    },
+    {
+      "name": "initial_scale_1",
+      "config": "configs/validation_initial_scale_1.json",
+      "purpose": "Initialization-scale control: ordinary weight scale, same architecture, seeds, labels, rates, and update schedule."
+    }
+  ],
+  "planned_runs": 80,
+  "sampling_unit": "Independent initialization seed; paired common data and equal-B minibatch stream. Coordinates are not independent replicates.",
+  "primary_metrics": [
+    "median_private_sqnorm",
+    "median_gradient_sqnorm",
+    "median_private_fraction",
+    "median_unit_edit_cost",
+    "covariance_ratio",
+    "max_coupling_factor",
+    "max_shared_private_ratio"
+  ],
+  "secondary_metrics": [
+    "nonlinear relative target error and anchored leakage for 16 fixed random coordinates, both edit signs",
+    "first ReLU gate-crossing radius",
+    "training/noisy/clean/test accuracy",
+    "numerical-rank sensitivity and residual-Hessian scale"
+  ],
+  "inclusion": "Retain every attempted run, capped run, failed run, and covariance solver status. Stable/interpolating comparisons explicitly require convergence and a converged covariance solve with ratio<=1+1e-6. Report exclusions.",
+  "planned_contrasts": [
+    "eta .01 vs .002 within B and suite",
+    "B32 vs B8 within eta and suite",
+    "corrupted vs clean at matched seed/B/eta",
+    "epoch_warmup vs clean at matched seed/B/eta",
+    "initial_scale_1 vs clean at matched seed/B/eta"
+  ],
+  "statistics": "Report all five paired seed effects and descriptive bootstrap intervals; no coordinate-level significance tests.",
+  "budget": "CPU float64; at most 20000 updates per run. No adaptive hyperparameter search or hidden retries.",
+  "interpretation": "Necessary conditions for frozen interpolating tangent models, not a guarantee of nonlinear SGD stability or inability to fit corrupted labels.",
+  "manuscript_constants": "Directional cost uses eta/2, not the 2/eta typo in the local original TeX. Private component bound is squared norm <=2B/eta."
+}

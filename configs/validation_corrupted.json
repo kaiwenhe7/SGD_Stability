@@ -1,0 +1,63 @@
+{
+  "name": "mnist_corrupted",
+  "classes": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples_per_class": 32,
+  "test_samples_per_class": 256,
+  "hidden_width": 256,
+  "initial_weight_scale": 15.0,
+  "dataset_seed": 0,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "batch_sizes": [
+    8,
+    32
+  ],
+  "learning_rates": [
+    0.002,
+    0.01
+  ],
+  "max_epochs": 10000,
+  "warmup_epochs": 300,
+  "warmup_start_fraction": 0.0001,
+  "loss_threshold": 1e-08,
+  "consecutive_epochs": 25,
+  "checkpoint_every": 1000,
+  "log_every": 500,
+  "rank_rtol": 1e-10,
+  "rankone_steps": 200,
+  "rankone_restarts": 4,
+  "edit_targets": 16,
+  "edit_amplitudes": [
+    -0.1,
+    -0.01,
+    -0.001,
+    -0.0001,
+    -1e-05,
+    -1e-06,
+    1e-06,
+    1e-05,
+    0.0001,
+    0.001,
+    0.01,
+    0.1
+  ],
+  "threads": 1,
+  "max_steps": 20000,
+  "warmup_steps": 2400,
+  "hold_steps": 200,
+  "training_dtype": "float64",
+  "edit_target_policy": "fixed_random",
+  "edit_target_seed": 1729,
+  "label_corruption_fraction": 0.5,
+  "label_corruption_seed": 2718
+}

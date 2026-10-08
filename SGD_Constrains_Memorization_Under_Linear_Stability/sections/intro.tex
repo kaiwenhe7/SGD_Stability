@@ -1,0 +1,10 @@
+\section{Introduction}
+Stochastic Gradient Descent is one of the most widly known and used optimization algorithms for training deep neural networks. Compared to the classical Gradient Descent algorithm, SGD uses mini batches of examples per iteration, which reduced cost per iteration. In practice, it has been observed that SGD is not only preferred for its fast iteration speed but also due to it's implicit regularization that finds solutions that generalize better than GD.
+
+Many methods have been employed to study the effects of SGD such as using a SDE to approximate SGD; however, many of the regularization effects of SGD come from the combination of stochasticity and large step size. Hence, it is unclear whether the stochasticity is sufficient for capturing all of the benefits of SGD. Another approach is to study SGD via linear stability theory. This is beneficial in that it is able to capture the effects of both the stochasticity and large step sizes. Linear stability theory can explain why GD and SGD escape from sharp minima and move towards well behaved minima. 
+
+
+\begin{enumerate}
+    \item What properties of the data does SGD prefer?
+    \item Is there a more practical tool that allows us to directly analyze SGD stability?
+\end{enumerate}

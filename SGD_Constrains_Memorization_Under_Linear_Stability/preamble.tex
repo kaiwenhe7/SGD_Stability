@@ -1,0 +1,371 @@
+\documentclass{article}
+\usepackage{fullpage}
+
+% ===== BASIC PACKAGES =====
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{microtype}
+\usepackage{xfrac}
+\usepackage{bbm}
+
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+% ===== GRAPHICS AND FIGURES =====
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{wrapfig}
+
+% ===== TABLES =====
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{array}
+
+% ===== ALGORITHMS =====
+\usepackage{algorithm}
+\usepackage{algorithmic}
+% Alternative: \usepackage{algpseudocode} 
+
+% ===== COLORS AND HYPERLINKS =====
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+% ===== BIBLIOGRAPHY =====
+\PassOptionsToPackage{numbers, compress}{natbib}
+
+
+% ===== ADDITIONAL USEFUL PACKAGES =====
+\usepackage{enumitem}  % Better control over lists
+\usepackage{bbm}       % For indicator functions \mathbbm{1}
+\usepackage{dsfont}    % Alternative math fonts
+\usepackage{nicefrac}  % Nice inline fractions
+\usepackage{bm}        % Bold math symbols
+\usepackage{centernot} % For negated symbols
+
+
+% ========================================
+% MATHEMATICAL OPERATORS
+% ========================================
+
+% ===== LINEAR ALGEBRA =====
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\Diag}{Diag}
+\DeclareMathOperator{\vect}{vec}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\spn}{span}
+\DeclareMathOperator{\Vol}{Vol}
+
+% ===== OPTIMIZATION =====
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\minimize}{minimize}
+\DeclareMathOperator*{\maximize}{maximize}
+\DeclareMathOperator{\prox}{prox}
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\Hess}{Hess}
+
+% ===== PROBABILITY AND STATISTICS =====
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\Corr}{Corr}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\DeclareMathOperator*{\essinf}{ess\,inf}
+
+% ===== NEURAL NETWORK SPECIFIC =====
+\DeclareMathOperator{\ReLU}{ReLU}
+\DeclareMathOperator{\softmax}{softmax}
+\DeclareMathOperator{\sigmoid}{sigmoid}
+
+\DeclareMathOperator{\width}{width}
+\DeclareMathOperator{\depth}{depth}
+
+
+% ========================================
+% NOTATION: VECTORS AND MATRICES
+% ========================================
+
+% ===== LOWERCASE BOLD (vectors) =====
+\newcommand{\ba}{\mathbf{a}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bc}{\mathbf{c}}
+\newcommand{\bd}{\mathbf{d}}
+\newcommand{\be}{\mathbf{e}}
+\newcommand{\bff}{\mathbf{f}}
+\newcommand{\bg}{\mathbf{g}}
+\newcommand{\bh}{\mathbf{h}}
+\newcommand{\boldm}{\mathbf{m}}
+\newcommand{\bp}{\mathbf{p}}
+\newcommand{\bq}{\mathbf{q}}
+\newcommand{\br}{\mathbf{r}}
+\newcommand{\bs}{\mathbf{s}}
+\newcommand{\bt}{\mathbf{t}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bv}{\mathbf{v}}
+\newcommand{\bw}{\mathbf{w}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\by}{\mathbf{y}}
+\newcommand{\bz}{\mathbf{z}}
+
+% ===== UPPERCASE BOLD (matrices) =====
+\newcommand{\bA}{\mathbf{A}}
+\newcommand{\bB}{\mathbf{B}}
+\newcommand{\bC}{\mathbf{C}}
+\newcommand{\bD}{\mathbf{D}}
+\newcommand{\bE}{\mathbf{E}}
+\newcommand{\bF}{\mathbf{F}}
+\newcommand{\bG}{\mathbf{G}}
+\newcommand{\bH}{\mathbf{H}}
+\newcommand{\bI}{\mathbf{I}}
+\newcommand{\bJ}{\mathbf{J}}
+\newcommand{\bK}{\mathbf{K}}
+\newcommand{\bL}{\mathbf{L}}
+\newcommand{\bM}{\mathbf{M}}
+\newcommand{\bN}{\mathbf{N}}
+\newcommand{\bO}{\mathbf{O}}
+\newcommand{\bP}{\mathbf{P}}
+\newcommand{\bQ}{\mathbf{Q}}
+\newcommand{\bR}{\mathbf{R}}
+\newcommand{\bS}{\mathbf{S}}
+\newcommand{\bT}{\mathbf{T}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bV}{\mathbf{V}}
+\newcommand{\bW}{\mathbf{W}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bZ}{\mathbf{Z}}
+
+% ===== SPECIAL VECTORS =====
+\newcommand{\bzero}{\mathbf{0}}
+\newcommand{\ones}{\mathbf{1}}
+
+% ===== GREEK BOLD =====
+\newcommand{\balpha}{\boldsymbol{\alpha}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\bgamma}{\boldsymbol{\gamma}}
+\newcommand{\bdelta}{\boldsymbol{\delta}}
+\newcommand{\bepsilon}{\boldsymbol{\epsilon}}
+\newcommand{\bvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\blambda}{\boldsymbol{\lambda}}
+\newcommand{\bmu}{\boldsymbol{\mu}}
+\newcommand{\bnu}{\boldsymbol{\nu}}
+\newcommand{\bxi}{\boldsymbol{\xi}}
+\newcommand{\bpi}{\boldsymbol{\pi}}
+\newcommand{\brho}{\boldsymbol{\rho}}
+\newcommand{\bsigma}{\boldsymbol{\sigma}}
+\newcommand{\btau}{\boldsymbol{\tau}}
+\newcommand{\bphi}{\boldsymbol{\phi}}
+\newcommand{\bvarphi}{\boldsymbol{\varphi}}
+\newcommand{\bpsi}{\boldsymbol{\psi}}
+\newcommand{\bomega}{\boldsymbol{\omega}}
+
+\newcommand{\bGamma}{\boldsymbol{\Gamma}}
+\newcommand{\bDelta}{\boldsymbol{\Delta}}
+\newcommand{\bTheta}{\boldsymbol{\Theta}}
+\newcommand{\bLambda}{\boldsymbol{\Lambda}}
+\newcommand{\bSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bUpsilon}{\boldsymbol{\Upsilon}}
+\newcommand{\bPhi}{\boldsymbol{\Phi}}
+\newcommand{\bPsi}{\boldsymbol{\Psi}}
+\newcommand{\bOmega}{\boldsymbol{\Omega}}
+\newcommand{\bPi}{\boldsymbol{\Pi}}
+
+% ===== TILDE NOTATION =====
+\newcommand{\tA}{\widetilde{A}}
+\newcommand{\tB}{\widetilde{B}}
+\newcommand{\tL}{\widetilde{L}}
+\newcommand{\tU}{\widetilde{U}}
+\newcommand{\tV}{\widetilde{V}}
+\newcommand{\tS}{\widetilde{\Sigma}}
+\newcommand{\ts}{\widetilde{\sigma}}
+\newcommand{\tW}{\widetilde{W}}
+\newcommand{\tX}{\widetilde{X}}
+\newcommand{\tY}{\widetilde{Y}}
+\newcommand{\tf}{\widetilde{f}}
+\newcommand{\tg}{\widetilde{g}}
+
+
+% ========================================
+% NORMS AND METRICS
+% ========================================
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\abs}[1]{\left\lvert#1\right\rvert}
+\newcommand{\normone}[1]{\left\lVert#1\right\rVert_1}
+\newcommand{\normtwo}[1]{\left\lVert#1\right\rVert_2}
+\newcommand{\normF}[1]{\left\lVert#1\right\rVert_\text{F}}
+\newcommand{\norminf}[1]{\left\lVert#1\right\rVert_\infty}
+\newcommand{\normnuc}[1]{\left\lVert#1\right\rVert_*}
+\newcommand{\normop}[1]{\left\lVert#1\right\rVert_\text{op}}
+\newcommand{\normspec}[1]{\left\lVert#1\right\rVert_2}
+\newcommand{\inner}[2]{\left\langle#1,#2\right\rangle}
+
+
+% ========================================
+% PROBABILITY NOTATION
+% ========================================
+\renewcommand{\Pr}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+
+\newcommand{\given}{\,|\,}
+\newcommand{\ind}{\mathbbm{1}}  % Indicator function
+\newcommand{\iid}{\text{i.i.d.}}
+\newcommand{\as}{\text{a.s.}}
+
+
+% ========================================
+% SETS AND SPACES
+% ========================================
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cG}{\mathcal{G}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cM}{\mathcal{M}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cO}{\mathcal{O}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\cS}{\mathcal{S}}
+\newcommand{\cT}{\mathcal{T}}
+\newcommand{\cU}{\mathcal{U}}
+\newcommand{\cV}{\mathcal{V}}
+\newcommand{\cW}{\mathcal{W}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cY}{\mathcal{Y}}
+\newcommand{\cZ}{\mathcal{Z}}
+
+
+% ========================================
+% NEURAL NETWORK SPECIFIC NOTATION
+% ========================================
+
+% ===== NETWORK PARAMETERS =====
+\newcommand{\layer}[1]{^{[#1]}}           % Layer superscript
+\newcommand{\Wlayer}[1]{\bW\layer{#1}}    % Weight matrix for layer
+\newcommand{\blayer}[1]{\mathbf{b}\layer{#1}}  % Bias vector for layer
+\newcommand{\alayer}[1]{\mathbf{a}\layer{#1}}  % Activation for layer
+\newcommand{\zlayer}[1]{\mathbf{z}\layer{#1}}  % Pre-activation for layer
+
+% ===== COMMON NEURAL NETWORK NOTATION =====
+\newcommand{\loss}{\ell}                   % Loss function
+\newcommand{\risk}{\mathcal{R}}           % Risk/Expected loss
+\newcommand{\emprisk}{\widehat{\mathcal{R}}}  % Empirical risk
+\newcommand{\model}{\cH}                  % Hypothesis class/model class
+
+
+% ========================================
+% GENERALIZATION BOUNDS NOTATION
+% ========================================
+
+% ===== COMPLEXITY MEASURES =====
+\newcommand{\Rad}{\mathfrak{R}}           % Rademacher complexity
+\newcommand{\EmpRad}{\widehat{\mathfrak{R}}}  % Empirical Rademacher complexity
+\newcommand{\VC}{\text{VC}}               % VC dimension
+\newcommand{\cover}{\mathcal{N}}          % Covering number
+\newcommand{\pack}{\mathcal{M}}           % Packing number
+\newcommand{\fat}{\text{fat}}             % Fat-shattering dimension
+
+% ===== COMPRESSION AND SPARSITY =====
+\newcommand{\sparsity}{\text{sparsity}}
+\newcommand{\compression}{\text{CR}}     % Compression ratio
+\newcommand{\nnz}{\text{nnz}}            % Number of non-zeros
+
+
+% ========================================
+% OPTIMIZATION NOTATION
+% ========================================
+\newcommand{\learning}{\eta}              % Learning rate
+\newcommand{\momentum}{\beta}             % Momentum parameter
+\newcommand{\lip}{L}                      % Lipschitz constant
+\newcommand{\smooth}{\beta}               % Smoothness constant
+\newcommand{\strongly}{\mu}               % Strong convexity parameter
+\newcommand{\hess}{\nabla^2}              % Hessian
+
+
+% ========================================
+% COMPLEXITY NOTATION
+% ========================================
+\newcommand{\BigO}{\mathcal{O}}
+\newcommand{\BigOmega}{\Omega}
+\newcommand{\BigTheta}{\Theta}
+\newcommand{\softO}{\widetilde{\mathcal{O}}}
+\newcommand{\poly}{\text{poly}}
+
+
+% ========================================
+% SPECIAL NOTATION
+% ========================================
+\newcommand{\defeq}{\coloneqq}            % Definition equals
+\newcommand{\eqdef}{\eqqcolon}            % Equals by definition
+
+
+
+% ========================================
+% THEOREM ENVIRONMENTS
+% ========================================
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{claim}[theorem]{Claim}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{assumption}[theorem]{Assumption}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{note}[theorem]{Note}
+\newtheorem{observation}[theorem]{Observation}
+
+
+% ========================================
+% AUTHOR COMMENTS
+% ========================================
+\newcommand{\rk}[1]{{\color{purple}{[RK: #1]}}}
+\newcommand{\pd}[1]{{\color{blue}{[PD: #1]}}}
+\newcommand{\kaiwen}[1]{{\color{red}{[KW: #1]}}}
+\newcommand{\todo}[1]{{\color{orange}{[TODO: #1]}}}
+
+
+% ========================================
+% PROJECT-SPECIFIC COMMANDS
+% ========================================
+
+% Add your project-specific notation here
+\newcommand{\Reff}{\ensuremath{R_\text{eff}}}
+\newcommand{\punif}{\ensuremath{p^\text{unif}}}
+
+
+% ========================================
+% MISCELLANEOUS
+% ========================================
+
+% Better spacing in align environments
+\setlength{\jot}{8pt}
+
+% Theorem-like environment without numbering for remarks
+\newtheorem*{remark*}{Remark}
+\newtheorem*{note*}{Note}

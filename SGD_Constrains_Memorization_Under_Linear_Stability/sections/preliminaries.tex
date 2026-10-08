@@ -1,0 +1,69 @@
+\section{The Setting}
+Let $\{(x_i, y_i)\}_{i=1}^N \subset \R^{n\times 1}$ and $f(\theta;\, \cdot)$ be a neural network parameterized by $\theta \in \R^d$.
+
+We consider mean squared loss function $\ell_i(\theta) = \frac{1}{2}(f(\theta;\, x_i) - y_i)^2$, and we want to minimize the loss function 
+\begin{equation}
+    \mathcal{L}(\theta) = \frac{1}{N}\sum_{i=1}^N \ell_i(\theta)
+\end{equation}
+using SGD iterations
+\begin{equation}
+    \theta_{t+1} = \theta_t - \eta \nabla \hat{\mathcal{L}}(\theta_t) 
+\end{equation}
+Here $\eta>0$ is defined as the step size, and $\hat{\mathcal{L}_t}(\theta)$ is a stochastic approximation of $\mathcal{L}(\theta)$
+\begin{equation}
+    \hcL_t(\theta):= \frac{1}{B}\sum_{i\in \cB_t}\ell_i(\theta)
+\end{equation}
+where $\cB_t$ is an independently drawn subset of indices from $[n]$ of size $B$
+
+Analyzing full trajectory of SGD with large step sizes in the full setting is intractable. Thus, the goal of linear stability analysis is to analyze the set of minima $\theta^*$ and characterize whether SGD/GD is able to stably converge or diverge from those minima. Hence, the conditions of converge and divergence should inform what kind of implicit biases these optimizers have.
+
+\begin{definition}[Linearized Dynamics]
+Let $\theta^*$ be a twice differentiable interpolating minima and denote
+\begin{equation}
+g_i := \nabla_\theta f(\theta^*; x_i), \qquad H_i :=\nabla^2\ell_i(\theta^*)
+\end{equation}
+Then, by taking a taylor expansion around $\theta^*$, the dynamics near $\theta^*$ is given by
+\begin{equation}
+    \theta_{t+1} = \theta_t - \frac{\eta}{B}\sum_{i\in \cB_t} H_i(\theta_t - \theta^*) - \frac{\eta}{B}\sum_{i\in \cB_t}\nabla \ell_i(\theta^*)
+\end{equation}
+Since $\theta^*$ is an interpolating minima, we have that 
+\begin{equation}
+    \nabla \ell_i(\theta^*)
+\end{equation}
+Furthermore, since the loss is mean squared, each $H_i$ is given by
+\[H_i = \nabla^2_\theta \ell_i(\theta^*) = g_ig_i^T + (f(\theta^*; x_i) - y_i)\nabla^2_\theta f(\theta^*;x_i) = g_ig_i^T\]
+Without loss of generality, we can center $\theta^* = 0$, leading to the linearized dynamics
+\begin{equation}
+    \theta_{t+1} = \left(I - \frac{\eta}{B}\sum_{i\in \cB_t}H_i \right)\theta_t
+\end{equation}
+\end{definition}
+
+Since the focus of our work is on the dynamical stability around a minima, we consider the following definition of stability
+
+\begin{definition}[Mean Squared Stability]
+Given Linearized dynamics, we say that $\theta^*$ is mean squared stable for threshold $\eta^* > 0$ if 
+
+\begin{equation}
+    \limsup_{t\rightarrow \infty} \E [\|\theta_t - \theta^*\|^2]
+\end{equation}
+is finite if and only if the stepsize $\eta \leq \eta^*$
+\end{definition}
+
+In previous works, Mulayoff and Michaeli provides an exact condition for whether SGD is mean squared stable
+
+\begin{theorem}[Mean squared stability for interpolating minima]
+Assume that $\theta^*$ is a twice differentiable interpolating minimum. Consider the linear dynamics of $\{\theta_t\}$ and define
+\begin{equation}
+    C := \frac{1}{2} (I\otimes H + H\otimes I), \qquad D:= (1-p)H\otimes H + \frac{p}{N}\sum_{i=1}^N H_i \otimes H_i
+\end{equation}
+and $p:= \frac{N-B}{B(N-1)}$. Then the dynamics is mean squared stable with threshold step size 
+\begin{equation}
+\eta^* = \frac{2}{\lambda_{\text{max}} (C^\dagger D)}
+\end{equation}
+Equivalently,
+\begin{equation}
+    \mu^*D \preceq 2C
+\end{equation}
+\end{theorem}
+
+If we take $B = N$, the above equation recovers the classical GD stability bound $\eta^* < \frac{2}{\lambda_{max}(H)}$. The issue is that due to the kronecker form, there is nothing informative about how SGD actually regularizes. For $p>0$, we can maybe get the sense that SGD penalizes the variance of the term $H_i \otimes H_i$, but we still dont know what exactly what SGD regularizes per example. In this paper we show that SGD prevents memorization.

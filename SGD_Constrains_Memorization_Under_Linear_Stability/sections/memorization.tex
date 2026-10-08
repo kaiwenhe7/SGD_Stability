@@ -1,0 +1,117 @@
+\section{Formulating Memorization}
+At an interpolating minima $\theta^*$ where SGD converges, let $\Phi = [g_1, g_2,\dots, g_n] \in \R^{d\times n}$ be the network's neural tangent kernel with $\Phi = U\Sigma V^T$ as the SVD. Recall that $H = \frac{1}{n}\sum_{i=1}^n g_ig_i^T = \frac1n \Phi\Phi^T$. We refer to each $u_j$ as a curvature mode of $H$. By linearly expanding around the learned neural network around $\theta^*$,
+\begin{equation}
+    f(\theta^* + d; x_i) = g_i^Td + \cO (\|d\|^2)
+\end{equation}
+where we can see that the tangent features $g_i$ determines how small perturbations of the parameters affect the output of the prediction for each datapoint $x_i$.
+Our work on memorization asks the crucial question of determining where and importantly how much we need to perturb to change the output of a datapoint $i$ while leaving other outputs unchanged. 
+
+\begin{definition}[Isolated Edit]
+Fix a training example $i$. In the tangent model, an isolated edit of size $\Delta>0$ is a parameter perturbation $d$ such that 
+\[f(\theta^* + d;\, x_i) = \Delta, \quad f(\theta^* + d;\, x_i) = 0 \, \forall j\neq i\]
+\end{definition}
+
+
+
+Consider a perturbation along mode $u_j$, such that $\theta \leftarrow \theta^* + \epsilon u_j$. To understand what happens to the output of datapoint $x_i$, we linearize the neural network
+\[f(\theta^* + \epsilon u_j; \, x_i) \approx f(\theta^*; x_i) + \epsilon g_i^Tu_j \]
+The quantity $g_i^Tu_j$ represents the sensitivity of training example $x_i$ to a perturbation of mode $j$. We can rewrite this quantity to the sample space of $v_i$.
+\[g_i^Tu_j = \sqrt{n\lambda_j}\,V_{ij}\]
+Collecting over all feature vectors $g_i$, we can see that 
+\[\Phi^T u_j = \sqrt{n\lambda_j}\, v_{j}\]
+where $v_j$ characterizes how much each example's feature vector changes when we perturb curvature mode $u_j$. 
+
+In order to bound the local edit, we need to be able to figure out the exact direction that we need to perturb in order to affect datapoint $i$ while leaving other datapoints unaffected. The key object of our study will be a tangent gradient's private component.
+
+\begin{definition}[Private Gradient Component]
+Let $\cS_{-i} : = \text{span}\{g_j: i\neq j\}$ and $P_{-i}$ the projection onto the subspace $\cS_{-i}$. Then the private gradient curvature of $g_i$ is defined as 
+\begin{equation}
+    r_i := (I-P_{-i})g_i
+\end{equation}
+In other words, its the component of $g_i$ that cannot be reconstructed from the other tangent features. 
+We also denote $\nu_i = \|r_i\|$ as the private gradient curvature. 
+\end{definition}
+
+The following proposition will illustrate the importance of the component $r_i$ to memorization strength.
+
+
+
+\begin{theorem}[Local Edit Penalty]
+Suppose we want to perturb the network by $\delta d$ such that we change the prediction output of datapoint $x_i$ by $\Delta$, then the minimum distance that we need to change the parameters is lower bounded by the following
+
+\[\min_{\Phi^T\delta d = \Delta e_i} \|\delta d\|^2 \geq \frac{\eta}{2B}\Delta^2\]
+\end{theorem}
+\begin{proof}
+    The constraint that the perturbation $\delta d$ only affects the output of datapoint $i$ is precisely characterized by the private gradient component of $i$
+    \[q_i = \frac{r_i}{\|r_i\|}\]
+    Thus the minimization can be rewritten as
+    \begin{equation}
+        \min_{\alpha g_i^Tq_i = \Delta} \|\alpha q_i\|
+    \end{equation}
+    Recognizing that $g_i^Tq_i = \|r_i\|_2^2$. The minimizer is given by 
+    \[\alpha = \frac{\Delta}{\|r_i\|^2} \]
+    From Theorem~\ref{thm:private}, this gives us the lower bound 
+    \[ \frac{\eta}{2B}\Delta^2\]
+\end{proof}
+From this theorem, it is saying that for a linearly stable solution, SGD constrains the neural network's ability to memorize the data: it requires a large change in the neural network parameters to arbitrarily change the output of a specific data point. 
+Similarly, for any arbitrary vector $b$ in the range of $\Phi^T$, we can similarly bound the perturbation magnitude for our neural network output to change by $b$. 
+
+\begin{theorem}[Directional Edit Penalty]
+Suppose we want to perturb the network by some vector $\delta d$ such that we change the prediction output of the network by $b \in \text{range}(\Phi^T)$, then the minimum distance that we need to change the parameters is lower bounded by the following
+
+\[\min_{\Phi^T\delta d = b} \|\delta d\|^2 = b^T(\Phi^T\Phi)^\dagger b \geq \frac2\eta \left[ \frac{1-p}{n}\|b\|_2^2 + p\frac{\|b\|_4^4}{\|b\|_2^2} \right]\]
+\end{theorem}
+\begin{proof}
+    Since $b\in \text{range}(\Phi^T)$, we have that 
+    \[\Phi^T\delta d = b \implies \delta d = (\Phi^T)^\dagger b = \Phi(\Phi^T \Phi)^\dagger d\]
+    with $\delta d$ a unique solution. Thus the minimum perturbation is 
+    \begin{align}
+        \|\delta d\|^2 &= b^T (\Phi^T \Phi)^\dagger\Phi^T\Phi(\Phi^T \Phi)^\dagger b \\
+        &= b^T(\Phi^T \Phi)^\dagger b = b^TK^\dagger b
+    \end{align}
+    To get the lower bound on $\|\delta d\|_2^2 =  b^TK^\dagger b$, let $u = \delta d/ \sqrt{b^TK^\dagger b}$ be a unit perturbation direction. 
+    Since $\Phi^T\delta d = b$, then 
+    \[g_i^Tu = b_i/\sqrt{b^TK^\dagger b} \quad \forall i\]
+    Consequently,
+    \[\alpha(u) = \frac{\|b\|_2^2}{nb^TK^\dagger b}, \quad m_4(u) = \frac{\|b\|_4^4}{n (b^TK^\dagger b)^2}\]
+    Invoking the results of Corollary~\ref{cor:directional} and substituting for Equation~\ref{eq:directional}, we get that 
+    \[\eta \left[ (1-p)\frac{\|b\|_2^4}{n^2(b^TK^\dagger b)^2}+p \frac{\|b\|_4^4}{n (b^TK^\dagger b)^2} \right] \leq 2\frac{\|b\|_2^2}{nb^TK^\dagger b}\]
+    Simplifying, we get 
+    \[b^TK^\dagger b \geq \frac\eta2 \left[ \frac{1-p}{n}\|b\|_2^2 + p\frac{\|b\|_4^4}{\|b\|_2^2} \right]\]
+\end{proof}
+
+\begin{corollary}
+Suppose that $b$ is mostly influencing a subset $\cS$ of just $k$ datapoints, such that
+\begin{equation}
+    \sum_{i\in S}b_i^2 \geq (1-\epsilon)\|b\|_2^2
+\end{equation}
+then the minimum norm to edit the neural network is 
+\begin{equation}
+    \min_{\Phi^T\delta d = b} \|\delta d\|^2 \geq \frac2\eta \left[\frac{1-p}{n} + \frac{p}{k}(1-\epsilon)^2 \right] \|b\|_2^2
+\end{equation}
+\end{corollary}
+
+On one extreme, if all of the tangent features $g_i$ are orthogonal, then we have that $\|r_i\| = 1,\, \forall g_i$. This implies that the network has learned a unique representation for each datapoint: in other words, the data is memorized. 
+
+The main result is that under SGD mean stability, SGD implicitly bounds each datapoint's private component. 
+
+\begin{theorem}[Universal Private Component Bound]
+\label{thm:private}
+Under the conditions of mean stability with step size $\eta$ and batch size $B$, SGD bounds the private component of each gradient
+
+\begin{equation}
+    \|r_i\|^2 \leq \frac{2B}{\eta}
+\end{equation}
+\end{theorem}
+\begin{proof}
+    When $\|r_i\|^2 > 0$, set $u = r_i/\|r_i\|_2$. Then we have that $g_i^Tu = \|r_i\|$ and $g_j^Tu = 0$ for $j\neq i$. Then we have $\alpha(u) = \|r_i\|^2/n$ and $m_4(u) = \|r_i\|^4$. Plugging into the stability condition of Corollary~\ref{cor:directional}, we have 
+    \begin{align}
+    \eta \left[ (1-p) \frac{\|r_i\|_2^2}{n^2} + p\frac{\|r_i\|^2}{n}\right] &\leq 2\frac{\|r_i\|}{n} \\
+    \|r_i\|\cdot \left[\frac{1-p}{n} + p\right] &\leq\frac{2}{\eta}
+    \end{align}
+    It can be easily verified that for $p = \frac{n-B}{B(n-1)}$ that 
+    \[\frac{1-p}{n} + p = \frac{1}{B}\]
+    which gives us the final bound
+    \[\|r_i\| \leq \frac{2B}{\eta}\]
+\end{proof}
+The bound on the per example memorizing strength allows us to bound a neural network's memorization

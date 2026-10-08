@@ -1,0 +1,257 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\input{preamble}
+
+\newcommand{\hcL}{\hat{\mathcal{L}}}
+
+\title{SGD Constrains Memorization Under Linear Stability}
+\author{Kaiwen He}
+\date{September 2026}
+
+\begin{document}
+
+\maketitle
+
+\input{sections/intro}
+
+\input{sections/preliminaries}
+
+\input{sections/memorization}
+
+
+\section{A linear stability theorem for orthogonal projections}
+Obtaining a stronger bound on $\|r_i\|^2$ requires a stronger linear stability theorem that takes into account the pairwise influence of modes from orthogonal subspaces. To this end we develop a general stability theorem for SGD based on orthogonal projections. Recall that at each SGD step, we draw a random independent subset $\cB_t \subset [n]$ of size $B$. Then the iterations of SGD around a minima is modeled as 
+
+\[\theta_{t+1} = (I-\frac\eta B (\sum_{i\in \cB_t}H_i))\theta_t\]
+
+Assuming mean square stability, the exact stability characterization of Mulayoff and Michaeli implies 
+
+\begin{equation}
+    \eta \E \Tr(XH_\cB X H_\cB) \leq 2 \Tr(HX^2) \quad \text{for every symmetric } X
+\end{equation}
+
+Consider any set of mutually orthogonal projectors $P_1,...,P_m$ with $\tau_a := \Tr(P_aH)>0.$ Define a matrix $\cA$ such that 
+\begin{equation}
+    \cA_{ij} := \frac{\E_\cB \|P_iH_{\cB}P_j\|_F^2}{\sqrt{\tau_i\tau_j}}
+\end{equation}
+
+The diagonal of $\cA$ is the second moment of the curvature within a subspace normalized by its average curvature. The off diagonal entry measures how much of the subspace of $H_\cB$ is shared with with subspace $i$ and subspace $j$.
+
+\begin{theorem}(Projection Stability)
+\label{thm:projection}
+Under mean-square stability, we have that 
+\begin{equation}
+    \eta \cA \preceq 2I_m
+\end{equation}
+\end{theorem}
+\begin{proof}
+    For an arbitrary vector $t\in \R^m$, choose the symmetric matrix
+    \begin{equation}
+        X = \sum_{i=1}^m\frac{t_i}{\sqrt{\tau_i}}P_a
+    \end{equation}
+    Orthogonality of $P_i$ gives 
+    \begin{align}
+        \Tr(HX^2) &= \sum_i \frac{t_i^2}{\tau_i}\Tr(HP_i) \\
+        &= \sum_i t_i^2
+    \end{align}
+    Similarly,
+    \begin{align}
+        \Tr(P_i H_\cB P_j H_\cB) &= \Tr(P_i P_i H_\cB P_j P_j H_\cB) \\
+        &= \|P_i H_\cB P_j \|_F^2
+    \end{align}
+    Expanding the term $\E \Tr(XH_\cB X H_\cB)$, we get 
+    \begin{align}
+        \E \Tr(XH_\cB X H_\cB) &= \E\Tr\left( \sum_{i=1}^m \frac{t_i}{\sqrt{\tau_i}} (P_i H_\cB) \sum_{j=1}^m \frac{t_j}{\sqrt{\tau_j}}(P_j H_\cB) \right) \\
+        &= \sum_i \sum_j \frac{t_it_j}{\sqrt{\tau_i \tau_j}}\E\Tr(P_iH_\cB P_j H_\cB)\\
+        &= \sum_i \sum_j t_it_j \cA_{ij} \\
+        &= t^T\cA t
+    \end{align}
+    Using the mean stability condition gives us the final bound
+    \[\eta \cA \preceq 2I_m\]
+\end{proof}
+
+\subsection{Stronger Private component bound}
+
+We can now apply our theorem to two projectors $P_{-i}$ and $Q = q_iq_i^T$. Assume that the private component is nonzero $\tau_Q := \Tr(QH) = \|r_i\|^2 >0$ and $\tau_P := \Tr(PH) >0$. Let
+\[c_i:= \|Pg_i\|^2 \qquad s_i := 2\tau_P - \eta \E \|PH_\cB P\|_F^2 \]
+where $c_i$ measures datapoint $x_i$'s sensitivity in the shared subspace. $s_i$ represents a slack from the projection stability inequality. From the theorem we necessarily have that $s_i>0$. 
+
+\begin{theorem}
+    Let $P = P_{-i}$, $r_i = (I-P)g_i$, $c_i = \|Pg_i\|^2$, and $s_i = 2\Tr(PH) - \eta \E\|PH_\cB P\|_F^2$
+
+    Under mean-square stability, we have $s_i\geq 0$. When $\|r_i\|_2^2>0$ and $s_i>0$,
+    \[\|r_i\|^2 \leq \frac{2B}{\eta}\left( 1+ \frac{\eta^2c_i^2}{Bns_i}\right)^{-1}\]
+
+    If $s_i = 0$, mean stability forces $r_i = 0$, so no private curvature exists.
+\end{theorem}
+\begin{proof}
+    First we compute the entries of the matrix $\cA$. Firstly, we have 
+    \[\cA_{11} = \frac{\E\|PH_\cB P\|_F^2}{\tau_P}\]. To compute $\cA_{12}, \, \cA_{22}$, we use the following quantities
+    \begin{align}
+        q_i^TH_\cB q_i &= \frac{\|r_i\|^2}{B} \mathbbm{1}\{i \in \cB\} \\
+        \Tr(QH) &= q_i^T H q_i = \frac{1}{n} (q_i^Tg_i)^2 = \frac{\|r_i\|^2}{n} \\
+        \E \|QH_\cB Q\|_F^2 &= \E \Tr(q_i^TH_\cB q_i)^2 = \E \frac{(q_i^Tg_i)^4}{B^2}\mathbbm{1}\{i\in \cB\} = \frac{\|r_i\|^4}{Bn} \\
+    \end{align}
+    Hence,
+    \begin{equation}
+        \cA_{22} = \frac{\E \|QH_\cB Q\|_F^2}{\Tr(QH)} = \frac{\|r_i\|^2}{B}
+    \end{equation}
+    To compute the off diagonal, we can see that by definition, every $g_j$ with $j\neq i$ lies completely in the range of $P$. Thus, $Q g_j = 0$, and whenever $j\neq i$ we have $Q(g_jg_j^T)P = 0$. This gives us
+    \begin{equation}
+        QH_\cB P = \frac{r_i(Pg_i)^T}{B} \mathbbm{1}\{i\in\cB\} 
+    \end{equation}
+    which implies 
+    \begin{equation}
+        \E \| QH_\cB P\|_F^2 = \E\Tr(\frac{r_i(Pg_i)^T(Pg_i)r_i^T}{B^2} \mathbbm{1}\{i\in\cB\} = \frac{\|r_i\|^2 c_i}{Bn}
+    \end{equation}
+    and 
+    \[\cA_{12} = \cA_{21} = \frac{\|r_i\|c_i}{B\sqrt{n\tau_P}}\]
+
+    Using Theorem~\ref{thm:projection},we have the condition
+
+    \begin{equation}
+        2I_2 - \eta \cA = \begin{bmatrix}
+            \frac{s_i}{\tau_i} & -\frac{\eta c_i \|r_i\|}{B\sqrt{n\tau_i}} \\
+            -\frac{\eta c_i \|r_i\|}{B\sqrt{n\tau_i}} & 2 - \frac{\eta \|r_i\|^2}{B}
+        \end{bmatrix}
+        \succeq 0
+    \end{equation}
+    The weaker condition of requiring the diagonal to be positive gives us the universal private component bound 
+    \[\|r_i\|^2 \leq \frac{2B}{\eta}\]
+
+    To obtain the stronger condition, the PSD condition requires the determinant to be positive
+    \begin{equation}
+        s_i\left ( 2 - \frac{\eta \|r_i\|^2}{B}\right) - \frac{\eta^2 c_i \|r\|^2}{B^2n\tau_i} \geq 0
+    \end{equation}
+    rearranging and solving for $\|r_i\|^2$ gives us the stronger condition
+    \begin{equation}
+        \|r_i\|^2 \leq \frac{2B}{\eta} \left(1 + \frac{\eta c_i^2}{B n s_i} \right)^{-1}
+    \end{equation}
+\end{proof}
+
+\section{SAM private bound}
+Under our setting we can also obtain a bound on the private component for SAM when SAM is in a linearly stable interpolating minima.
+
+\subsection{Linear Dynamics for general operators}
+Let $F_t \in \R^{d\times d}$ be a family of symmetric positive semidefinite matrices, where each $F_t$ is independent with finite second moments. We define linearized dynamics for general operators as
+\begin{equation}\label{eq:opdynamics}
+    \theta_{t+1} = U_t\theta_t, \quad U_t = I - \eta F_t, \quad \eta > 0
+\end{equation}
+
+For Full batch gradient descent, the $F_t = H$ for all $t$. For SGD, each $F_t = H_{\cB_t}$. Later we will show that for unnormalized SAM, each $F_t = H_{\cB_t} + \gamma H_{\cB_t}^2$. 
+
+\begin{definition}[Operator Mean Square stability]
+The recursion in Eq~\ref{eq:opdynamics} is said to be mean square stable if, for every initialization $\theta_0$,
+\begin{equation}
+\sup_{t\geq 0} \E \|\theta_t\| <\infty
+\end{equation}
+\end{definition}
+
+We let $\Sigma_t = \E [\theta_t\theta_t^T]$. By independence, we get the recursion 
+\[\Sigma_{t+1} = \cT_\eta (\Sigma_t), \quad \cT_\eta(X) =  \E [(I-\eta F) X (I-\eta F)\]
+Expanding the update $\cT_\eta(X)$, we have 
+\[\cT_\eta(X) = X - \eta(\bar{F}X + X\bar{F}) + \eta^2 \E [FXF]\]
+
+\begin{theorem}[Operator Mean Square stability conditions]
+Let $\bar{F} = \E F$, $C(X) = \frac12 (\bar{F} X + X \bar{F}) $, and $D(X) = \E[FXF]$
+    The operator linearized dynamics are mean square stable if and only if 
+    \[\cT\eta \preceq I \iff \eta D \preceq 2C \]
+\end{theorem}
+
+\begin{corollary}[Operator Master Theorem]
+Taking the quadratic form of the operators. We have that for any symmetrix matrix $X$, linear stability implies
+\begin{equation}
+    \eta \E \Tr(XFXF) \leq 2 \Tr(\bar{F}X^2)
+\end{equation}
+\end{corollary}
+\begin{proof}
+    Given a symmetric matrix X, we have the following quadratic forms
+    \begin{align}
+        \langle X, C(X)\rangle &= \Tr(\bar{F} X) \\
+        \langle X, D(X) \rangle &= \E \Tr(XFXF)
+    \end{align}
+\end{proof}
+
+\subsection{Unnormalized SAM linearization}
+Under the conditions of linear stability around an interpolating minima, define
+\[g_i = \nabla_\theta f(\theta^*; x_i), \quad H_i = \nabla^2\ell_i (\theta^*) = g_ig_i^T \]
+The main updates for unnormalized SAM are defined as the following
+\begin{align}
+    \theta_{t+1/2} &= \theta_t + \gamma \nabla L_\cB (\theta) \\
+    \theta_{t+1} &= \theta_t - \eta \nabla L_\cB (\theta_{t+1/2})
+\end{align}
+let $\delta = \theta_t - \theta^*$ be a perturbation. Taylor expanding around $\theta^*$,
+\[\nabla L_\cB(\theta^* + \delta) = H_\cB \delta + o(\|\delta\|)\]
+and applying this to the SAM updates we have 
+\begin{align}
+    \theta_{t+1/2} - \theta^* &\approx (I+\gamma H_\cB)\delta  \\
+    \theta_{t+1} - \theta^* &= [I - \eta H_\cB (I + \gamma H_\cB)]\delta
+\end{align}
+Thus for unnormalized SAM, the linearized dynamics operator is 
+\[ F_t = F_{\cB_t} = H_{\cB_t} + \gamma H_{B_t}^2 \succeq 0 \]
+
+\subsection{SAM Private component bound}
+
+\begin{theorem}[Universal Private component bound]
+    Let $\theta^*$ be a mean squared stable interpolating minima for unnormalized SAM. Then the private components are bounded as 
+
+\begin{align}
+    \|r_i\|^2 &\leq \frac{2B}{\eta} \left(1 + \frac{\gamma \|g_i\|^2}{B} \right)^{-1}  \\
+    \|r_i\|^2 &\leq\frac{B}{2\gamma}\left( \sqrt{1 + \frac{8\gamma}{\eta} } - 1 \right) \quad (\gamma >0)
+\end{align}
+Note that as $\gamma$ approaches $0$, the above bound converges towards $\frac{2B}{\eta}$, which is the SGD universal private component bound.
+\end{theorem}
+\begin{proof}
+We use the projection stability conditions from Theorem~\ref{thm:projection}. Similar to the proof of SGD, set
+\[P = P_{-i}, \quad q_i = \frac{r_i}{\|r_i\|}, \quad Q = q_iq_i^T, \quad c_i:=1 + \frac{\gamma \|g_i\|^2}{B}\]
+To evaluate the entries of $\cA$ we need some basic identities
+\begin{align}
+    H_\cB q_i &= \mathbbm{1}\{i\in \cB\} \frac{\|r_i\|}{B}g_i \\
+    q_i H_\cB q_i &= \mathbbm{1}\{i\in \cB\} \frac{\|r_i\|^2}{B} \\
+    q_i H_\cB^2 q_i &= \|H_\cB q_i\|^2 =  \mathbbm{1}\{i\in \cB\} \frac{\|r_i\|^2\, \|g_i\|^2}{B^2}
+\end{align}
+Consequently,
+\begin{align}
+    q_i^TF_\cB q_i &= q_i H_\cB q_i + \gamma q_i H_\cB^2 q_i \\
+    &= \mathbbm{1}\{i\in \cB\} \frac{\|r_i\|^2}{B} + \mathbbm{1}\{i\in \cB\} \frac{\|r_i\|^2\, \|g_i\|^2}{B^2} \\
+    &= \mathbbm{1}\{i\in \cB\} \frac{\|r_i\|^2}{B} \left( 1 + \frac{\gamma \|g_i\|^2}{B} \right)\\
+    &= \mathbbm{1}\{i\in \cB\} \frac{\|r_i\|^2\, c_i}{B}
+\end{align}
+
+\begin{align}
+   \mu_Q &= \Tr(Q\bar{F}) = q_i^T\bar{F}q_i \\
+    &= \E_\cB [q_i^TF_\cB q_i] =  \E_\cB [ \mathbbm{1}\{i\in \cB\}] \frac{\|r_i\|^2\, c_i}{B} \\
+    &= \frac{B}{n}\frac{\|r_i\|^2\, c_i}{B} = \frac{\|r_i\|^2\, c_i}{n}
+\end{align}
+
+\begin{align}
+    A_{QQ} &= \E \|QF_\cB Q\|_F^2 / \mu_Q =  \frac{\E(q_i^TF_\cB q_i)^2}{\mu_Q}\\
+    &= \frac{B}{n}\frac{\|r_i\|^4\, c_i^2}{B^2} \cdot \frac{n}{\|r_i\|^2c_i} \\
+    &= \frac{\|r_i\|^2\, c_i}{B}
+\end{align}
+\end{proof}
+Let $s_i = $
+
+
+\begin{theorem}[Stronger SAM PCB]
+For a stronger SAM private component bound first let $c_i = 1 + \frac{\gamma \|g_i\|^2}{B}$, $a_i = \|g_i\|^2 - \|r_i\|^2$, and $s_i = 2 \Tr(P\bar{F}) - \eta \E \|PF_\cB P\|_F^2$, then under mean squared stability we have,
+
+\begin{equation}
+    \|r_i\|^2 \leq \frac{2B}{\eta c_i}\left(1 + \frac{\eta c_i^2 a_i^2}{Bn s_i} \right)^{-1}
+\end{equation}
+\end{theorem}
+    
+
+
+
+\appendix
+
+\input{sections/stability_corollaries}
+
+
+
+
+
+
+\end{document}
+
